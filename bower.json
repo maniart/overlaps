@@ -1,14 +1,9 @@
 {
   "name": "overlaps",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "homepage": "https://github.com/maniart/overlaps",
   "authors": [
     "maniart <mani.art@gmail.com>"
-  ],
-  "description": "Collective audiospace",
-  "main": "index.html",
-  "keywords": [
-    "interactive"
   ],
   "license": "MIT",
   "ignore": [
@@ -19,6 +14,7 @@
     "tests"
   ],
   "dependencies": {
-    "pixi.js": "~3.0.7"
+    "pixi.js": "~3.0.7",
+    "two.js": "~0.4.0"
   }
 }
