@@ -16,7 +16,33 @@ var rawImage = document.querySelector('#raw-image');
 var rawImageCtx = rawImage.getContext('2d');
 var diffImage = document.querySelector('#diff-image');
 var diffImageCtx = diffImage.getContext('2d');
+var grid = document.querySelector('#grid');
+var gridCtx = grid.getContext('2d');
 var lastImageData;
+
+function drawGrid(canvas, xCount, yCount) {
+    var i = 0;
+    var j = 0;
+    var ctx = canvas.getContext('2d');
+    var width = canvas.width;
+    var height = canvas.height;
+    var cellWidth = width / xCount;
+    var cellHeight = height / yCount;
+    for(i; i < width; i += cellWidth) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, height);
+        ctx.closePath();
+        ctx.stroke();
+    }
+    for(j; j < width; j += cellHeight) {
+        ctx.beginPath();
+        ctx.moveTo(0, j);
+        ctx.lineTo(width, j);
+        ctx.closePath();
+        ctx.stroke();
+    }
+}
 
 function captureFromCamera(output) {
     if(navigator.getUserMedia) {
@@ -87,7 +113,10 @@ function loop() {
 }
 
 function init() {
+    drawGrid(grid, 10, 10);
     mirror(rawImage);
     captureFromCamera(cameraOutput);
     loop()
 }
+
+init();
