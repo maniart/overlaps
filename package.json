@@ -1,0 +1,19 @@
+{
+  "name": "overlaps",
+  "version": "1.0.0",
+  "description": "Code for interactive installation titled \"overlaps\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maniart/overlaps.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maniart/overlaps/issues"
+  },
+  "homepage": "https://github.com/maniart/overlaps#readme"
+}
