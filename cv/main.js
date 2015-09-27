@@ -18,16 +18,18 @@ var diffImage = document.querySelector('#diff-image');
 var diffImageCtx = diffImage.getContext('2d');
 var grid = document.querySelector('#grid');
 var gridCtx = grid.getContext('2d');
+var GRID_RESOLUTION_X = 20;
+var GRID_RESOLUTION_Y = 20;
 var lastImageData;
 
-function drawGrid(canvas, xCount, yCount) {
+function drawGrid(canvas, resolutionX, resolutionY) {
     var i = 0;
     var j = 0;
     var ctx = canvas.getContext('2d');
     var width = canvas.width;
     var height = canvas.height;
-    var cellWidth = width / xCount;
-    var cellHeight = height / yCount;
+    var cellWidth = width / resolutionX;
+    var cellHeight = height / resolutionY;
     ctx.lineWidth = 0.2;
     for(i; i < width; i += cellWidth) {
         ctx.beginPath();
@@ -109,14 +111,53 @@ function blend(inputCtx, outputCtx, width, height) {
     lastImageData = sourceData;
 }
 
+function sweep(canvas, resolutionX, resolutionY, sensitivity) {
+    var ctx = canvas.getContext('2d');
+    var i;
+    var j;
+    var k = 0;
+    var cellWidth = canvas.width / resolutionX;
+    var cellHeight = canvas.height / resolutionY;
+    var cellImageData;
+    var average = 0;
+    for(i = 0; i < 400; i += cellWidth) {
+        //console.log('i ', i);
+        for(j = 0; j < 400; j += cellHeight) {
+
+            //console.log(i, j);
+                //console.log('j ', j);
+            cellImageData = ctx.getImageData(i, j, cellWidth, cellHeight).data;
+            while(k < cellImageData.length / 4) {
+                average += (cellImageData[k*4] + cellImageData[k*4+1] + cellImageData[k*4+2]) / 3;
+                ++k;
+            }
+            average = Math.round(average / (cellImageData.length / 4));
+            //console.log(average);
+            gridCtx.beginPath();
+            gridCtx.rect(i, j, cellWidth, cellHeight);
+            if(average > sensitivity) {
+                gridCtx.fillStyle = '#000000';
+            } else {
+                gridCtx.fillStyle = '#ffffff';
+            }
+            gridCtx.fill();
+            gridCtx.closePath();
+            average = 0;
+            k = 0;
+        }
+    }
+
+}
+
 function loop() {
     drawRawImage(cameraOutput, rawImage);
     blend(rawImageCtx, diffImageCtx, 400, 400);
+    sweep(diffImage, GRID_RESOLUTION_X, GRID_RESOLUTION_Y, 10);
     requestAnimFrame(loop);
 }
 
 function init() {
-    drawGrid(grid, 10, 10);
+    //drawGrid(grid, GRID_RESOLUTION_X, GRID_RESOLUTION_Y);
     mirror(rawImage);
     captureFromCamera(cameraOutput);
     loop();
