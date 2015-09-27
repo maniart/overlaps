@@ -9,16 +9,19 @@
         }
         #grid {
             background-color: #fff;
-            border: 1px solid #000;
+            border: 0px solid #000;
+        }
+        #camera-output {
+            display: none;
         }
     </style>
     <title></title>
 </head>
 <body>
-    <video id="camera-output" autoplay width="320" height="240"></video>
-    <canvas id="raw-image" width="320" height="240"></canvas>
-    <canvas id="diff-image" width="320" height="240"></canvas>
-    <canvas id="grid" width="320" height="240"></canvas>
+    <video id="camera-output" autoplay width="520" height="400"></video>
+    <canvas id="raw-image" width="400" height="400"></canvas>
+    <canvas id="diff-image" width="400" height="400"></canvas>
+    <canvas id="grid" width="400" height="400"></canvas>
 
     <script src="main.js"></script>
 </body>

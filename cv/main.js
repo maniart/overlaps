@@ -28,6 +28,7 @@ function drawGrid(canvas, xCount, yCount) {
     var height = canvas.height;
     var cellWidth = width / xCount;
     var cellHeight = height / yCount;
+    ctx.lineWidth = 0.2;
     for(i; i < width; i += cellWidth) {
         ctx.beginPath();
         ctx.moveTo(i, 0);
@@ -58,8 +59,10 @@ function captureFromCamera(output) {
     }
 }
 
-function drawRawImage(cameraInput, outputCtx) {
-    outputCtx.drawImage(cameraInput, 0, 0, cameraInput.width, cameraInput.height);
+function drawRawImage(cameraInput, output) {
+    var ctx = output.getContext('2d');
+    var smallInputSide = Math.min(cameraInput.width, cameraInput.height);
+    ctx.drawImage(cameraInput, 0, 0, smallInputSide, smallInputSide, 0, 0, output.width, output.height);
 }
 
 function mirror(canvas) {
@@ -83,14 +86,14 @@ function diff(output, input1, input2, accuracy) {
     var length = input1.length;
     var average1;
     var average2;
-    var diff;
+    var _diff;
     while(i < length * accuracy) {
         average1 = (input1[i*4] + input1[i*4+1] + input1[i*4+2]) / 2.5;
         average2 = (input2[i*4] + input2[i*4+1] + input2[i*4+2]) / 2.5;
-        diff = threshold(abs(average1 - average2));
-        output[i*4] = diff;
-        output[i*4+1] = diff;
-        output[i*4+2] = diff;
+        _diff = threshold(abs(average1 - average2));
+        output[i*4] = _diff;
+        output[i*4+1] = _diff;
+        output[i*4+2] = _diff;
         output[i*4+3] = 0xFF;
         ++i;
     }
@@ -101,14 +104,14 @@ function blend(inputCtx, outputCtx, width, height) {
     var blendedData;
     if(!lastImageData) lastImageData = inputCtx.getImageData(0, 0, width, height);
     blendedData = inputCtx.createImageData(width, height);
-    diff(blendedData.data, sourceData.data, lastImageData.data, 0.25);
+    diff(blendedData.data, sourceData.data, lastImageData.data, .25);
     outputCtx.putImageData(blendedData, 0, 0);
     lastImageData = sourceData;
 }
 
 function loop() {
-    drawRawImage(cameraOutput, rawImageCtx);
-    blend(rawImageCtx, diffImageCtx, 320, 240);
+    drawRawImage(cameraOutput, rawImage);
+    blend(rawImageCtx, diffImageCtx, 400, 400);
     requestAnimFrame(loop);
 }
 
@@ -116,7 +119,7 @@ function init() {
     drawGrid(grid, 10, 10);
     mirror(rawImage);
     captureFromCamera(cameraOutput);
-    loop()
+    loop();
 }
 
 init();
