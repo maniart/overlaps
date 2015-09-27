@@ -20,6 +20,8 @@ var grid = document.querySelector('#grid');
 var gridCtx = grid.getContext('2d');
 var GRID_RESOLUTION_X = 20;
 var GRID_RESOLUTION_Y = 20;
+var initialGridSideSize = grid.width;
+var scaleFactor = window.innerHeight / grid.height;
 var lastImageData;
 
 function drawGrid(canvas, resolutionX, resolutionY) {
@@ -121,18 +123,13 @@ function sweep(canvas, resolutionX, resolutionY, sensitivity) {
     var cellImageData;
     var average = 0;
     for(i = 0; i < 400; i += cellWidth) {
-        //console.log('i ', i);
         for(j = 0; j < 400; j += cellHeight) {
-
-            //console.log(i, j);
-                //console.log('j ', j);
             cellImageData = ctx.getImageData(i, j, cellWidth, cellHeight).data;
             while(k < cellImageData.length / 4) {
                 average += (cellImageData[k*4] + cellImageData[k*4+1] + cellImageData[k*4+2]) / 3;
                 ++k;
             }
             average = Math.round(average / (cellImageData.length / 4));
-            //console.log(average);
             gridCtx.beginPath();
             gridCtx.rect(i, j, cellWidth, cellHeight);
             if(average > sensitivity) {
@@ -149,6 +146,13 @@ function sweep(canvas, resolutionX, resolutionY, sensitivity) {
 
 }
 
+function scaleSquareCanvas(canvas, factor) {
+    var size = canvas.width * factor;
+    canvas.height = size;
+    canvas.width = size;
+    canvas.getContext('2d').scale(factor, factor);
+}
+
 function loop() {
     drawRawImage(cameraOutput, rawImage);
     blend(rawImageCtx, diffImageCtx, 400, 400);
@@ -159,6 +163,7 @@ function loop() {
 function init() {
     //drawGrid(grid, GRID_RESOLUTION_X, GRID_RESOLUTION_Y);
     mirror(rawImage);
+    scaleSquareCanvas(grid, scaleFactor);
     captureFromCamera(cameraOutput);
     loop();
 }
