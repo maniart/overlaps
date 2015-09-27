@@ -18,11 +18,52 @@ var diffImage = document.querySelector('#diff-image');
 var diffImageCtx = diffImage.getContext('2d');
 var grid = document.querySelector('#grid');
 var gridCtx = grid.getContext('2d');
-var GRID_RESOLUTION_X = 20;
-var GRID_RESOLUTION_Y = 20;
+var GRID_RESOLUTION_X = 40;
+var GRID_RESOLUTION_Y = 40;
 var initialGridSideSize = grid.width;
 var scaleFactor = window.innerHeight / grid.height;
 var lastImageData;
+var beeps = [];
+
+// create a 2d matrix of `beep`s the size of our image
+for(var i = 0; i < GRID_RESOLUTION_X; i++) {
+    var column = [];
+    for(var j = 0; j < GRID_RESOLUTION_Y; j++) {
+        column.push(new Wad({
+            source: 'square',
+            volume: 1.4,
+            defaultVolume: 1.4,
+            defaultEnv: {
+                //attack: 0.01,
+                decay: 0.005,
+                //hold: 0.015,
+                release: 0.3,
+                sustain: 0
+            },
+            filter: [
+                {
+                    env: {
+                        attack: 0.2,
+                        frequency: 600,
+                        q: 8.5,
+                        type: 'lowpass'
+                    }
+                }
+            ],
+            globalReverb: false,
+            loop: false,
+            //panning: {
+                //location: 0,
+                //type: 'stereo'
+            //},
+            pitch: 440,
+            playable: 1,
+            tremolo: null,
+            vibrato: null
+        }));
+    }
+    beeps.push(column);
+}
 
 function drawGrid(canvas, resolutionX, resolutionY) {
     var i = 0;
@@ -117,13 +158,15 @@ function sweep(canvas, resolutionX, resolutionY, sensitivity) {
     var ctx = canvas.getContext('2d');
     var i;
     var j;
+    var posX;
+    var posY;
     var k = 0;
     var cellWidth = canvas.width / resolutionX;
     var cellHeight = canvas.height / resolutionY;
     var cellImageData;
     var average = 0;
-    for(i = 0; i < 400; i += cellWidth) {
-        for(j = 0; j < 400; j += cellHeight) {
+    for(i = 0; i < canvas.width; i += cellWidth) {
+        for(j = 0; j < canvas.height; j += cellHeight) {
             cellImageData = ctx.getImageData(i, j, cellWidth, cellHeight).data;
             while(k < cellImageData.length / 4) {
                 average += (cellImageData[k*4] + cellImageData[k*4+1] + cellImageData[k*4+2]) / 3;
@@ -133,7 +176,11 @@ function sweep(canvas, resolutionX, resolutionY, sensitivity) {
             gridCtx.beginPath();
             gridCtx.rect(i, j, cellWidth, cellHeight);
             if(average > sensitivity) {
+                posX = i/cellWidth;
+                posY = j/cellHeight;
                 gridCtx.fillStyle = '#000000';
+                //beeps[posX][posY].play();
+                //console.log(posX, posY);
             } else {
                 gridCtx.fillStyle = '#ffffff';
             }
@@ -163,8 +210,10 @@ function loop() {
 function init() {
     //drawGrid(grid, GRID_RESOLUTION_X, GRID_RESOLUTION_Y);
     mirror(rawImage);
-    scaleSquareCanvas(grid, scaleFactor);
+
     captureFromCamera(cameraOutput);
+    scaleSquareCanvas(grid, scaleFactor);
+    //window.addEventListener('resize', scaleSquareCanvas.bind(null, grid, window.innerHeight / grid.height));
     loop();
 }
 
