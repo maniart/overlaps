@@ -193,6 +193,14 @@ function sweep(canvas, resolutionX, resolutionY, sensitivity) {
 
 }
 
+function center(canvas) {
+    var windowWidth = window.innerWidth;
+    var width = canvas.width;
+    var diff = windowWidth - width;
+    var marginLeft = diff / 2;
+    canvas.style.marginLeft = marginLeft + 'px';
+}
+
 function scaleSquareCanvas(canvas, factor) {
     var size = canvas.width * factor;
     canvas.height = size;
@@ -208,6 +216,7 @@ function loop() {
 }
 
 function init() {
+    center(grid);
     //drawGrid(grid, GRID_RESOLUTION_X, GRID_RESOLUTION_Y);
     mirror(rawImage);
 
