@@ -18,77 +18,11 @@ var diffImage = document.querySelector('#diff-image');
 var diffImageCtx = diffImage.getContext('2d');
 var grid = document.querySelector('#grid');
 var gridCtx = grid.getContext('2d');
-var GRID_RESOLUTION_X = 20;
-var GRID_RESOLUTION_Y = 20;
+var GRID_RESOLUTION_X = 14;
+var GRID_RESOLUTION_Y = 14;
 var initialGridSideSize = grid.width;
 var scaleFactor = window.innerHeight / grid.height;
 var lastImageData;
-var beeps = [];
-
-// create a 2d matrix of `beep`s the size of our image
-for(var i = 0; i < GRID_RESOLUTION_X; i++) {
-    var column = [];
-    for(var j = 0; j < GRID_RESOLUTION_Y; j++) {
-        column.push(new Wad({
-            source: 'square',
-            volume: 1.4,
-            defaultVolume: 1.4,
-            defaultEnv: {
-                //attack: 0.01,
-                decay: 0.005,
-                //hold: 0.015,
-                release: 0.3,
-                sustain: 0
-            },
-            filter: [
-                {
-                    env: {
-                        attack: 0.2,
-                        frequency: 600,
-                        q: 8.5,
-                        type: 'lowpass'
-                    }
-                }
-            ],
-            globalReverb: false,
-            loop: false,
-            //panning: {
-                //location: 0,
-                //type: 'stereo'
-            //},
-            pitch: 440,
-            playable: 1,
-            tremolo: null,
-            vibrato: null
-        }));
-    }
-    beeps.push(column);
-}
-
-function drawGrid(canvas, resolutionX, resolutionY) {
-    var i = 0;
-    var j = 0;
-    var ctx = canvas.getContext('2d');
-    var width = canvas.width;
-    var height = canvas.height;
-    var cellWidth = width / resolutionX;
-    var cellHeight = height / resolutionY;
-    ctx.lineWidth = 0.2;
-    for(i; i < width; i += cellWidth) {
-        ctx.beginPath();
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, height);
-        ctx.closePath();
-        ctx.stroke();
-    }
-    for(j; j < width; j += cellHeight) {
-        ctx.beginPath();
-        ctx.moveTo(0, j);
-        ctx.lineTo(width, j);
-        ctx.closePath();
-        ctx.stroke();
-    }
-}
 
 function captureFromCamera(output) {
     if(navigator.getUserMedia) {
@@ -176,11 +110,9 @@ function sweep(canvas, resolutionX, resolutionY, sensitivity) {
             gridCtx.beginPath();
             gridCtx.rect(i, j, cellWidth, cellHeight);
             if(average > sensitivity) {
-                posX = i/cellWidth;
-                posY = j/cellHeight;
-                gridCtx.fillStyle = '#000000';
-                //beeps[posX][posY].play();
-                //console.log(posX, posY);
+                posX = Math.floor( i/cellWidth );
+                posY = Math.floor( j/cellHeight );
+                gridCtx.fillStyle = 'rgb(' + average + ',' + average + ',' + average +')';
             } else {
                 gridCtx.fillStyle = '#ffffff';
             }
@@ -211,18 +143,15 @@ function scaleSquareCanvas(canvas, factor) {
 function loop() {
     drawRawImage(cameraOutput, rawImage);
     blend(rawImageCtx, diffImageCtx, 400, 400);
-    sweep(diffImage, GRID_RESOLUTION_X, GRID_RESOLUTION_Y, 10);
+    sweep(diffImage, GRID_RESOLUTION_X, GRID_RESOLUTION_Y, 50);
     requestAnimFrame(loop);
 }
 
 function init() {
-    center(grid);
-    //drawGrid(grid, GRID_RESOLUTION_X, GRID_RESOLUTION_Y);
     mirror(rawImage);
-
     captureFromCamera(cameraOutput);
     scaleSquareCanvas(grid, scaleFactor);
-    //window.addEventListener('resize', scaleSquareCanvas.bind(null, grid, window.innerHeight / grid.height));
+    center(grid);
     loop();
 }
 
