@@ -11,6 +11,10 @@ window.requestAnimFrame = (function(){
             };
 })();
 
+if(!window.Worker) {
+    alert('For a better experience, please use a recent version of Chrome, Safari or Firefox.');
+}
+var sweeper = new Worker('sweeper.js');
 var cameraOutput = document.querySelector('#camera-output');
 var rawImage = document.querySelector('#raw-image');
 var rawImageCtx = rawImage.getContext('2d');
@@ -23,6 +27,12 @@ var GRID_RESOLUTION_Y = 14;
 var initialGridSideSize = grid.width;
 var scaleFactor = window.innerHeight / grid.height;
 var lastImageData;
+
+// kickoff the worker
+sweeper.postMessage({msg: 'sup yo'});
+sweeper.addEventListener('message', function(e) {
+    console.log('got this from sweeper: ', e.data);
+});
 
 function captureFromCamera(output) {
     if(navigator.getUserMedia) {
