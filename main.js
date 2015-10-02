@@ -28,12 +28,6 @@ var initialGridSideSize = grid.width;
 var scaleFactor = window.innerHeight / grid.height;
 var lastImageData;
 
-// kickoff the worker
-sweeper.postMessage({msg: 'sup yo'});
-sweeper.addEventListener('message', function(e) {
-    console.log('got this from sweeper: ', e.data);
-});
-
 function captureFromCamera(output) {
     if(navigator.getUserMedia) {
         navigator.getUserMedia({audio: false, video: true}, function(stream) {
